@@ -1,0 +1,134 @@
+(ns basilisp.contrib.bencode
+  "A port of nbb's bencode implementation to basilisp.
+
+  https://github.com/babashka/nbb/blob/bca8b5017a06768eb35d02a2d6233ca9c6c2f692/src/nbb/impl/bencode.cljs")
+
+(defn- index-of [s c]
+  (let [i (.index s c)]
+    (if (< i 0) (throw (python/Exception "out of input")) i)))
+
+(defn- slice
+  ([buffer start]
+   (if (< (len buffer) start)
+     (throw (python/Exception "out of input"))
+     (.__getitem__ buffer (python/slice start nil))))
+  ([buffer start end]
+   (if (> end (len buffer))
+     (throw (python/Exception "out of input"))
+     (.__getitem__ buffer (python/slice start end)))))
+
+(defn- decode-recur [data opts]
+  (case (str (slice data 0 1))
+    "i"
+    (let [data (slice data 1)
+          i (index-of data "e")]
+      [(int (slice data 0 i))
+       (slice data (inc i))])
+    "l"
+    (let [data (slice data 1)]
+      (loop [data data v (transient [])]
+        (if (= (str (slice data 0 1)) "e")
+          [(persistent! v) (slice data 1)]
+          (let [[value data] (decode-recur data opts)]
+            (recur data (conj! v value))))))
+    "d"
+    (let [data (slice data 1)
+          {:keys [keywordize-keys]} opts]
+      (loop [data data m (transient {})]
+        (if (= (str (slice data 0 1)) "e")
+          [(persistent! m) (slice data 1)]
+          (let [[k data] (decode-recur data opts)
+                [v data] (decode-recur data opts)
+                k (if keywordize-keys (keyword k) k)]
+            (recur data (assoc! m k v))))))
+    ;; else
+    (let [i (index-of data ":")
+          n (int (slice data 0 i))
+          data (slice data (inc i))]
+      [(str (slice data 0 n)) (slice data n)])))
+
+(defn decode
+  "Decode the first value in the bencoded ``data`` string according to
+  ``opts`` and return a [decoded* rest*] vector.
+
+  The decoded* item in the vector is the decoded value of the first
+  item in ``data`` while rest* is the remaining unencoded values.
+
+  If ``data`` cannot be decoded (e.g. is incomplete or an error
+  occurred), it returns a [nil ``data``] vector.
+
+  ``opts`` is a map with the following optional supported keys.
+
+  :keywordize-keys if the decoded value is a map, keywordize its keys."
+  [data opts]
+  (try
+    (decode-recur data opts)
+    (catch python/Exception _e [nil data])))
+
+(defn decode-all
+  "Decode all values in the bencoded ``data`` string and return them as
+  a [values* incomplete*] vector.
+
+  The values* item is a collection of the ``data`` decoded values,
+  while incomplete* is the rest of the ``data`` string that could not
+  be decoded.
+
+  ``opts`` is a map with the following keys
+
+  see ply:fn:`decode`."
+  ([data]
+   (decode-all data {}))
+  ([data opts]
+   (loop [items [] data data]
+     (let [[item data] (decode data opts)]
+       (if (nil? item)
+         [items data]
+         (recur (conj items item) data))))))
+
+(defn- utf8-bytes [s]
+  (len (python/bytes s "UTF-8")))
+
+(defn encode [data]
+  "Encode ``data`` to bencode encoding and return it as a string.
+
+  Can encode the following types
+
+  - strings.
+
+  - numbers.
+
+  - lists and vectors.
+
+  - maps, it will also encode any keyword keys to [ns/]name strings,
+    and will also order the entries in the output encoding
+    alphanumerically based on the keys.
+
+  - nil is encoded to the empty string.
+
+  Throws a `python/TypeError` if the ``data`` type is not supported."
+  (cond
+    (string? data)
+    (str (utf8-bytes data) ":" data)
+    (number? data)
+    (str "i" data "e")
+    (nil? data)
+    "0:"
+    (or (vector? data) (list? data))
+    (str "l" (apply str (map encode data)) "e")
+    (map? data)
+    (str "d" (->> data
+                  (reduce-kv (fn [acc k v]
+                               (assoc acc (if (keyword? k)
+                                            (str (when-let [n (namespace k)]
+                                                   (str n "/"))
+                                                 (name k))
+                                            k)
+                                      v)) {})
+                  (sort-by first)
+                  (map (fn [[k v]]
+                         (str (encode k) (encode v))))
+                  (apply str))
+         "e")
+
+    :else
+    (throw (python/TypeError (str [::unsupported :type (type data) :input (pr-str data)])))))
