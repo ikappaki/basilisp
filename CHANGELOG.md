@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
  * Ported nbb's nrepl-server module to basilisp (#412).
+ * Added rudimentary support for `clojure.stacktrace` with `print-cause-trace` (#xxx).
 ### Fixed
  * Fix issue with `case` evaluating all of its clauses expressions (#699).
  * Fix issue with relative paths dropping their first character on MS-Windows (#703).
