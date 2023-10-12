@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Fix issue with `with` failing with a traceback error when an exception is thrown (#714).
  * Fix issue with `sort-*` family of funtions returning an error on an empty seq (#716).
  * Fix issue with `ns` not being available after `in-ns` on the REPL (#xxx).
+ * Fix issue with `ns-resolve` throwing an error on macros (#xxx).
 
 ## [v0.1.0a2]
 ### Added
