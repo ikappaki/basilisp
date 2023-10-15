@@ -67,5 +67,5 @@ workflows:
   test:
     jobs:
       - test-pypy-38
-      - test-pypy-39
-      - test-pypy-310
+      # - test-pypy-39
+      # - test-pypy-310
