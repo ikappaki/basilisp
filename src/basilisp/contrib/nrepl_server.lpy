@@ -14,7 +14,7 @@
 (def ^:private log-levels
   "A compile time set used to determine which log levels should be
   included in the output."
-  #{:warn})
+  #{:warn :info})
 
 ;; helper compile time macros to log ``values`` according to the level
 ;; as filtered by `log-levels`.
