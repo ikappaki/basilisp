@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Fix issue with `sort-*` family of funtions returning an error on an empty seq (#716).
  * Fix issue with `ns` not being available after `in-ns` on the REPL (#xxx).
  * Fix issue with `ns-resolve` throwing an error on macros (#xxx).
+ * Fix issue with py module `readerwritelock` locks handling (#xxx).
 
 ## [v0.1.0a2]
 ### Added
