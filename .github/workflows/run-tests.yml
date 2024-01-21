@@ -124,8 +124,8 @@ jobs:
           DEPENDENCY_REGEX="$(poetry show -T --without=dev | awk '{print $1}' | paste -s -d '|' -)"
           [[ -z "$DEPENDENCY_REGEX" ]] && { echo "Error: can't source dependencies" ; exit 1; }
           echo ::deps $DEPENDENCY_REGEX
-          deps-start="$(sed -n '\/\\[tool.poetry.dependencies\\]/=' pyproject.toml"
-          deps-end="$(sed -n '\/\\[tool.poetry.dev-dependencies\\]/=' pyproject.toml"
+          deps-start="$(sed -n '\/^\\[tool.poetry.dependencies\\]$/=' pyproject.toml"
+          deps-end="$(sed -n '\/^\\[tool.poetry.dev-dependencies\\]$/=' pyproject.toml"
           echo ::pyproject-deps-section :start $deps-start :end $deps-end
           sed -i -E ''$deps-start,$deps-end's/(pytest)( = )(|\{ version = )"(\^|>=)([0-9])/\1\2\3"==\5/' pyproject.toml
           git diff
