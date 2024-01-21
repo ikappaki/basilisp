@@ -89,7 +89,7 @@ jobs:
     # <dependency-name> = ">=..."
     # <dependency-name> = { version = "^..." ...
     # <dependency-name> = { version = ">=..." ...
-runs-on: ${{matrix.os}}
+    runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -110,10 +110,12 @@ runs-on: ${{matrix.os}}
             ~/.cache/pypoetry
             ~/.local/share/pypoetry
           key: mdt-${{ runner.os }}-python-${{ matrix.version }}-poetry-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+      - name: Install Poetry
+        if: steps.cache-deps.outputs.cache-hit != 'true' && ! startsWith (matrix.os, 'windows')
+        run: curl -sSL https://install.python-poetry.org | python3 -
       - name: Install Poetry & Tox
         run: |
           pip install -U pip
-          pip install poetry
           pip install tox
       - name: Run tests
         env:
