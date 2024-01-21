@@ -124,8 +124,8 @@ jobs:
           TOX_SHOW_OUTPUT: "True"
           TOXENV: ${{ matrix.tox-env }}
         run: |
-          python -m poetry lock
-          export DEPENDENCY_REGEX="$(python -m poetry show -T --without=dev | awk '{print $1}' | paste -s -d '|' -)"
+          poetry lock
+          export DEPENDENCY_REGEX="$(poetry show -T --without=dev | awk '{print $1}' | paste -s -d '|' -)"
           echo ::deps $DEPENDENCY_REGEX
           sed -i -E 's/('"$DEPENDENCY_REGEX"')( = )"(\^|>=)([0-9])/\1\2"==\4/' pyproject.toml
           # git diff
