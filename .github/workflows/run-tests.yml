@@ -86,9 +86,10 @@ jobs:
     # following format
     #
     # <dependency-name> = "^..."
-    # or 
     # <dependency-name> = ">=..."
-    runs-on: ${{matrix.os}}
+    # <dependency-name> = { version = "^..." ...
+    # <dependency-name> = { version = ">=..." ...
+runs-on: ${{matrix.os}}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -126,11 +127,9 @@ jobs:
           echo ::deps $DEPENDENCY_REGEX
           SEC_START="$(sed -n '\/^\[tool.poetry.dependencies\]$/=' pyproject.toml)"
           SEC_END="$(sed -n '\/^\[tool.poetry.dev-dependencies\]$/=' pyproject.toml)"
-          echo ::pyproject-deps-section :line-start $SEC_START :line-end $SEC_END
-          echo sed -i -E ''$SEC_START,$SEC_END's/('$DEPENDENCY_REGEX')( = )(|\{ version = )"(\^|>=)([0-9])/\1\2\3"==\5/' pyproject.toml
+          echo ::pyproject.toml-section :line-start $SEC_START :line-end $SEC_END
           sed -i -E ''$SEC_START,$SEC_END's/('$DEPENDENCY_REGEX')( = )(|\{ version = )"(\^|>=)([0-9])/\1\2\3"==\5/' pyproject.toml
           git diff
-          cat pyproject.toml
           # tox run-parallel -p 2
 
   # report-coverage:
