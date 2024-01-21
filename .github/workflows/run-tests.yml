@@ -110,10 +110,10 @@ jobs:
             ~/.local/share/pypoetry
           key: mdt-${{ runner.os }}-python-${{ matrix.version }}-poetry-${{ hashFiles('pyproject.toml', 'tox.ini') }}
       - name: Install Poetry
-        uses: snok/install-poetry@v1
-      # - name: Install Poetry
-      #   # if: steps.cache-deps.outputs.cache-hit != 'true'
-      #   run: curl -sSL https://install.python-poetry.org | python3 -
+        # if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          pip uninstall poetry
+          curl -sSL https://install.python-poetry.org | python3 -
       - name: Install Tox
         run: |
           pip install -U pip
@@ -125,7 +125,7 @@ jobs:
           TOXENV: ${{ matrix.tox-env }}
         run: |
           DEPENDENCY_REGEX="$(poetry show -T --without=dev | awk '{print $1}' | paste -s -d '|' -)"
-          [[ -z "$DEPENDENCY_REGEX" ]] && { echo "can't source dependencies" } ; exit 1
+          [[ -z "$DEPENDENCY_REGEX" ]] && { echo "can't source dependencies" ; exit 1; }
           echo ::deps $DEPENDENCY_REGEX
           sed -i -E 's/('"$DEPENDENCY_REGEX"')( = )"(\^|>=)([0-9])/\1\2"==\4/' pyproject.toml
           poetry lock
