@@ -107,10 +107,6 @@ def seq_lrepr(
     else:
         items = iterable  # type: ignore
 
-    if meta and "alias" in meta and meta["alias"] == "@":
-       target = lrepr(items[1], **kwargs)
-       return "@" + target
-
     kw_items = kwargs.copy()
     kw_items["human_readable"] = False
     items = list(map(lambda o: lrepr(o, **kw_items), items))
