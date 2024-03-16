@@ -13,10 +13,15 @@
 
 ;; This test set tests the basic cl-format functionality
 
-(ns tests.basilisp.contrib.pprint.test-cl-format
-  (:use basilisp.pprint))
+(ns tests.basilisp.contrib.pprint.test-cl-format)
 
 (in-ns 'tests.basilisp.test-pprint)
+
+(use 'basilisp.pprint)
+(require '[basilisp.string :as str])
+(use '[basilisp.test :only (deftest is are run-tests)]
+      'tests.basilisp.contrib.pprint.test-helper
+      'basilisp.pprint)
 
 (def format cl-format)
 

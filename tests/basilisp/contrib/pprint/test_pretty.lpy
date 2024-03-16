@@ -16,6 +16,12 @@
 
 (in-ns 'tests.basilisp.test-pprint)
 
+(use 'basilisp.pprint)
+(require '[basilisp.string :as str])
+(use '[basilisp.test :only (deftest is are run-tests)]
+      'tests.basilisp.contrib.pprint.test-helper
+      'basilisp.pprint)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Unit tests for the pretty printer
