@@ -22,4 +22,6 @@
 
 ;; (load "contrib/pprint/test_pretty")
 
+(deftest dummy
+  (is (= 1 1)))
 
