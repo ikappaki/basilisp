@@ -18,6 +18,8 @@
         basilisp.pprint))
 
 ;; (import os) (do  (.append sys/path (os/getcwd)))
-(load "contrib/pprint/test_cl_format")
-(load "contrib/pprint/test_pretty")
+;;(use 'tests.basilisp.contrib.pprint.test-pretty)
+
+;; (load "contrib/pprint/test_pretty")
+
 

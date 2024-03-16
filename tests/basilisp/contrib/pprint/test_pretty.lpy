@@ -12,15 +12,14 @@
 ;; April 3, 2009
 
 
-(ns tests.basilisp.contrib.pprint.test-pretty)
+(ns tests.basilisp.contrib.pprint.test-pretty
+  (:refer-basilisp :exclude [format])
+  (:require [basilisp.string :as str])
+  (:use [basilisp.test :only (deftest is are run-tests)]
+        tests.basilisp.contrib.pprint.test-helper
+        basilisp.pprint))
 
-(in-ns 'tests.basilisp.test-pprint)
-
-(use 'basilisp.pprint)
-(require '[basilisp.string :as str])
-(use '[basilisp.test :only (deftest is are run-tests)]
-      'tests.basilisp.contrib.pprint.test-helper
-      'basilisp.pprint)
+;;(in-ns 'tests.basilisp.test-pprint)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -116,7 +115,7 @@ Usage: *hello*
 
   (binding [*print-pprint-dispatch* simple-dispatch]
     (write (var Foo) :stream nil))
-  "#'tests.basilisp.test-pprint/Foo"
+  "#'tests.basilisp.contrib.pprint.test-pretty/Foo"
 )
 
 
