@@ -1,4 +1,6 @@
 import platform
+import shutil
+import subprocess
 import sys
 
 import pytest
@@ -263,6 +265,35 @@ def test_fixtures_with_errors(
     result.assert_outcomes(passed=passes, failed=failures, errors=errors)
 
 
+def test_basilisp_test_noargs(pytester: pytest.Pytester):
+    runtime.Namespace.remove(sym.symbol("a.test-path"))
+
+    code = """
+    (ns tests.test-path
+      (:require
+       [basilisp.test :refer [deftest is]]))
+    (deftest passing-test
+      (is true))
+    """
+    pytester.makefile(".lpy", **{"./tests/test_path": code})
+
+    # I couldn't find a way to directly manipulate the pytester's
+    # `sys.path` with the precise control needed by this test, so I'm
+    # invoking `basilisp test` directly as a subprocess instead ...
+    basilisp = shutil.which("basilisp")
+    cmd = [basilisp, "test"]
+    result = subprocess.run(
+        ["basilisp.cmd", "test"], capture_output=True, text=True, cwd=pytester.path
+    )
+
+    print(f"\n\n--cmd--start: {' '.join(cmd)}")
+    print(f"\n\n--stdout--\n\n {result.stdout.strip()}")
+    print(f"\n\n--stderr--:\n\n {result.stderr.strip()}")
+    print(f"\n\n--cmd--end--: {' '.join(cmd)}\n\n")
+
+    assert result.returncode == 0
+
+
 def test_ns_in_syspath(pytester: pytest.Pytester, monkeypatch: pytest.MonkeyPatch):
     runtime.Namespace.remove(sym.symbol("a.test-path"))
 
@@ -328,7 +359,9 @@ def test_ns_not_in_syspath(pytester: pytest.Pytester):
     pytester.syspathinsert()
     result: pytest.RunResult = pytester.runpytest("test")
     assert result.ret != 0
-    result.stdout.fnmatch_lines(["*ModuleNotFoundError: No module named 'test.a'"])
+    result.stdout.fnmatch_lines(
+        ["*ModuleNotFoundError: Module named 'a.test-path' is not in sys.path"]
+    )
 
 
 def test_ns_with_underscore(pytester: pytest.Pytester):
