@@ -1487,7 +1487,7 @@
   "Return ``true`` if an :py:class:`basilisp.lang.interfaces.ISeq` can be produced from
   ``x``\\."
   [x]
-  (instance? basilisp.lang.interfaces/ISeqable x))
+  (basilisp.lang.interfaces/is_seqable x))
 
 (defn ^:inline sequential?
   "Return ``true`` if ``x`` implements :py:class:`basilisp.lang.interfaces.ISequential`\\."
@@ -3266,7 +3266,7 @@
   sequence."
   [v]
   (lazy-seq
-   (when (and (or (seq? v) (seqable? v)) (seq v))
+   (when-let [v (and (or (seq? v) (seqable? v)) (seq v))]
      (let [e (first v)
            r (rest v)]
        (if (or (seq? e) (seqable? e))

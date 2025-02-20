@@ -14,6 +14,7 @@ from typing import (
     overload,
 )
 
+from types import GeneratorType
 from typing_extensions import Self, Unpack
 
 from basilisp.lang.obj import LispObject as _LispObject
@@ -759,3 +760,6 @@ class IType(ABC):
        :ref:`data_types_and_records`"""
 
     __slots__ = ()
+
+def is_seqable(x):
+    return isinstance(x, ISeqable) or isinstance(x, GeneratorType)
