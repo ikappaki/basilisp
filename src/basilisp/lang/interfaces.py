@@ -1,6 +1,7 @@
 import itertools
 from abc import ABC, abstractmethod
 from collections.abc import Hashable, Iterable, Iterator, Mapping, Sequence, Sized
+from types import GeneratorType
 from typing import (
     AbstractSet,
     Any,
@@ -14,7 +15,6 @@ from typing import (
     overload,
 )
 
-from types import GeneratorType
 from typing_extensions import Self, Unpack
 
 from basilisp.lang.obj import LispObject as _LispObject
@@ -761,5 +761,6 @@ class IType(ABC):
 
     __slots__ = ()
 
+
 def is_seqable(x):
-    return isinstance(x, ISeqable) or isinstance(x, GeneratorType)
+    return isinstance(x, (GeneratorType, ISeqable))
